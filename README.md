@@ -1,6 +1,6 @@
 # R package 'pedSimulate'
 
-Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non-)random selection differntly for males and females.
+Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non)random selection differntly for males and females.
 
 ## Installation
 
@@ -22,12 +22,12 @@ Arguments are provided for the following:
 - Number of generations to simulate
 - Number of generation overlaps for sires
 - Number of generation overlaps for dams
-- (not )avoiding fullsib matings
-- (not )avoiding parent-progeny matings
+- Choice of avoiding fullsib matings
+- Choice of avoiding parent-progeny matings
 - Additive genetic variance in the base generation
 - Environment (plus residual) variance
-- (non-)random selection on females
-- (non-)random selection on males
+- (non)random selection on females
+- (non)random selection on males
 
 ### For details, please read the PDF manual.
 

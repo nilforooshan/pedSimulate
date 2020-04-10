@@ -54,16 +54,16 @@ simulatePed(
 ped : The output pedigree \code{data.frame}. Further information provided in \strong{Details}.
 }
 \description{
-Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non-)random selection differntly for males and females.
+Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non)random selection differntly for males and females.
 }
 \details{
 \code{fullsib = FALSE} : Avoid fullsib matings in each generation by replacing the male mate (SIRE) with a random SIRE among the selected sires, until no fullsib mating is left.
-After the pedigree is completed, if due to a small population bottleneck there is any fullsib mating remained, SIRE is set to 0.
+If due to a small population bottleneck there is any fullsib mating remained, it would be reported.
 
 \code{parentprogeny = FALSE} : Avoid parent-progeny matings in each generation by replacing the male mate (SIRE) with a random SIRE among the selected sires, until no parent-progeny mating is left.
-After the pedigree is completed, if due to a small population bottleneck there is any parent-progeny mating remained, SIRE is set to 0.
+If due to a small population bottleneck there is any parent-progeny mating remained, it would be reported.
 
-The output pedigree \code{data.frame} (\code{ped}) has 9 columns: ID, SIRE, DAM, SEX, GEN (generation number followed by 0 for the base generation), PA (parent average), MS (Mendelian Sampling), E (environment and residuals), and P (phenotype).
+The output pedigree \code{data.frame} (\code{ped}) has 9 columns: ID, SIRE, DAM, SEX, GEN (generation number starting with 0 for the base generation), PA (parent average), MS (Mendelian Sampling), E (environment and residuals), and P (phenotype).
 }
 \examples{
 ped = simulatePed(

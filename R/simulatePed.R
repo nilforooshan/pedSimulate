@@ -1,6 +1,6 @@
 #' @title Simulate pedigree, genetic merits and phenotypes
 #'
-#' @description Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non-)random selection differntly for males and females.
+#' @description Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non)random selection differntly for males and females.
 #'
 #' @param F0size : Even number of founder animals. No mortality and selection in this generation.
 #'
@@ -34,12 +34,12 @@
 #'
 #' @details
 #' \code{fullsib = FALSE} : Avoid fullsib matings in each generation by replacing the male mate (SIRE) with a random SIRE among the selected sires, until no fullsib mating is left.
-#' After the pedigree is completed, if due to a small population bottleneck there is any fullsib mating remained, SIRE is set to 0.
+#' If due to a small population bottleneck there is any fullsib mating remained, it would be reported.
 #'
 #' \code{parentprogeny = FALSE} : Avoid parent-progeny matings in each generation by replacing the male mate (SIRE) with a random SIRE among the selected sires, until no parent-progeny mating is left.
-#' After the pedigree is completed, if due to a small population bottleneck there is any parent-progeny mating remained, SIRE is set to 0.
+#' If due to a small population bottleneck there is any parent-progeny mating remained, it would be reported.
 #'
-#' The output pedigree \code{data.frame} (\code{ped}) has 9 columns: ID, SIRE, DAM, SEX, GEN (generation number followed by 0 for the base generation), PA (parent average), MS (Mendelian Sampling), E (environment and residuals), and P (phenotype).
+#' The output pedigree \code{data.frame} (\code{ped}) has 9 columns: ID, SIRE, DAM, SEX, GEN (generation number starting with 0 for the base generation), PA (parent average), MS (Mendelian Sampling), E (environment and residuals), and P (phenotype).
 #'
 #' @examples
 #' ped = simulatePed(
@@ -156,8 +156,8 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
       if(!fullsib) {
         fs.mate = fs_mate_finder(tmp, ped[,1:3])
         if(nrow(fs.mate) > 0) {
-          prev.fs = 0
-          while(nrow(fs.mate) > prev.fs)
+          prev.fs = nrow(fs.mate) + 1
+          while(nrow(fs.mate) < prev.fs)
           {
             prev.fs = nrow(fs.mate)
             fs.mates = paste(tmp$SIRE, tmp$DAM) %in% paste(fs.mate[,1], fs.mate[,2])
@@ -171,10 +171,10 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
       if(!parentprogeny) {
         pp.mate = pp_mate_finder(tmp, ped[,1:3])
         if(nrow(pp.mate) > 0) {
-          prev.pp = 0
-          while(nrow(pp.mate) > prev.fs)
+          prev.pp = nrow(pp.mate) + 1
+          while(nrow(pp.mate) < prev.pp)
           {
-            prev.fs = nrow(pp.mate)
+            prev.pp = nrow(pp.mate)
             pp.mates = paste(tmp$SIRE, tmp$DAM) %in% paste(pp.mate[,1], pp.mate[,2])
             tmp[pp.mates,]$SIRE = sample(sires, nrow(tmp[pp.mates,]))
             pp.mate = fs_mate_finder(tmp[pp.mates,], ped[,1:3])
@@ -198,27 +198,26 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
       ped = rbind(ped, tmp[,ordcol])
     }
   }
-  # Avoid fullsib matings
+  # Report fullsib matings, if any
   if(!fullsib) {
     fs.mate = fs_mate_finder(unique(ped[,2:3]), ped[,1:3])
     if(nrow(fs.mate) > 0) {
-      fs.mates = paste(ped$SIRE, ped$DAM) %in% paste(fs.mate[,1], fs.mate[,2])
-      ped[fs.mates, c("SIRE","SBV")] = 0
-      ped[fs.mates,]$P = NA
+      message("WARNING: Found fullsib matings.")
+      for(j in 1:nrow(fs.mate)) message(fs.mate[j,1], " ", fs.mate[j,2])
     }
   }
-  # Avoid parent-progeny matings
+  # Report parent-progeny matings, if any
   if(!parentprogeny) {
     pp.mate = fs_mate_finder(unique(ped[,2:3]), ped[,1:3])
     if(nrow(pp.mate) > 0) {
-      pp.mates = paste(ped$SIRE, ped$DAM) %in% paste(pp.mate[,1], pp.mate[,2])
-      ped[pp.mates, c("SIRE","SBV")] = 0
-      ped[pp.mates,]$P = NA
+      message("WARNING: Found parent-progeny matings.")
+      for(j in 1:nrow(pp.mate)) message(pp.mate[j,1], " ", pp.mate[j,2])
     }
   }
-  # Modify P==NA
-  ped$P[is.na(ped$P)] = (ped$DBV/2 + ped$MS + ped$E)[is.na(ped$P)]
+  # Replace SBV & DBV with PA
   ped$PA = (ped$SBV + ped$DBV)/2
   ped = ped[,c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P")]
+  # Re-base P
+  ped$P = ped$P - 2*min(ped$P)
   return(ped)
 }
