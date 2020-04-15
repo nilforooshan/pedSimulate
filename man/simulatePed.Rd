@@ -17,8 +17,8 @@ simulatePed(
   parentprogeny = TRUE,
   Va0,
   Ve,
-  f.rs = TRUE,
-  m.rs = TRUE
+  fsel = "R",
+  msel = "R"
 )
 }
 \arguments{
@@ -46,9 +46,9 @@ simulatePed(
 
 \item{Ve}{: Environment (plus residual) variance, set constant across generations.}
 
-\item{f.rs}{: If \code{TRUE} (default), random selection on females, if \code{FALSE}, selection on phenotypes, or true breeding values, if \code{Ve} = 0.}
+\item{fsel}{: If \code{"R"} (default), random selection on females; if \code{"P"}, selection on phenotypes, or true breeding values if \code{Ve} = 0; if \code{"PA"}, selection on true parent averages; redundant if \code{f.rate = 1}.}
 
-\item{m.rs}{: If \code{TRUE} (default), random selection on males, if \code{FALSE}, selection on phenotypes, or true breeding values, if \code{Ve} = 0.}
+\item{msel}{: If \code{"R"} (default), random selection on males; if \code{"P"}, selection on phenotypes, or true breeding values if \code{Ve} = 0; if \code{"PA"}, selection on true parent averages; redundant if \code{m.rate = 1}.}
 }
 \value{
 ped : The output pedigree \code{data.frame}. Further information provided in \strong{Details}.
@@ -79,8 +79,8 @@ ped = simulatePed(
   parentprogeny = FALSE,
   Va0 = 9,
   Ve = 36,
-  f.rs = TRUE,
-  m.rs = FALSE
+  fsel = "P",
+  msel = "PA"
 )
 
 }

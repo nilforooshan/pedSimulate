@@ -4,6 +4,14 @@ Simulate Pedigree, genetic merits and phenotypes with random mating followed by 
 
 ## Installation
 
+Installing the package from CRAN:
+
+```r
+install.packages("pedSimulate")
+```
+
+Installing the package from GitHub:
+
 ```r
 devtools::install_github('nilforooshan/pedSimulate')
 ```

@@ -26,9 +26,9 @@
 #'
 #' @param Ve : Environment (plus residual) variance, set constant across generations.
 #'
-#' @param f.rs : If \code{TRUE} (default), random selection on females, if \code{FALSE}, selection on phenotypes, or true breeding values, if \code{Ve} = 0.
+#' @param fsel : If \code{"R"} (default), random selection on females; if \code{"P"}, selection on phenotypes, or true breeding values if \code{Ve} = 0; if \code{"PA"}, selection on true parent averages; redundant if \code{f.rate = 1}. 
 #'
-#' @param m.rs : If \code{TRUE} (default), random selection on males, if \code{FALSE}, selection on phenotypes, or true breeding values, if \code{Ve} = 0.
+#' @param msel : If \code{"R"} (default), random selection on males; if \code{"P"}, selection on phenotypes, or true breeding values if \code{Ve} = 0; if \code{"PA"}, selection on true parent averages; redundant if \code{m.rate = 1}. 
 #'
 #' @return ped : The output pedigree \code{data.frame}. Further information provided in \strong{Details}.
 #'
@@ -55,18 +55,19 @@
 #'   parentprogeny = FALSE,
 #'   Va0 = 9,
 #'   Ve = 36,
-#'   f.rs = TRUE,
-#'   m.rs = FALSE
+#'   fsel = "P",
+#'   msel = "PA"
 #' )
 #'
 #' @export
-simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, ngen, overlap.s=0, overlap.d=0, fullsib=TRUE, parentprogeny=TRUE, Va0, Ve, f.rs=TRUE, m.rs=TRUE) {
+simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, ngen, overlap.s=0, overlap.d=0, fullsib=TRUE, parentprogeny=TRUE, Va0, Ve, fsel="R", msel="R") {
   # Check inputs
   F0size = round(F0size)
   littersize = round(littersize)
   ngen = round(ngen)
   overlap.s = round(overlap.s)
   overlap.d = round(overlap.d)
+  if(F0size < 2) stop("ERROR: F0size < 2")
   if((F0size %% 2)!=0) stop("ERROR: F0size should be an even number.")
   if(f.rate > 1) stop("ERROR: f.rate > 1")
   if(f.rate <= 0) stop("ERROR: f.rate <= 0")
@@ -87,8 +88,8 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
   if(overlap.s==0 & overlap.d==0) parentprogeny = TRUE
   if(Va0 < 0) stop("ERROR: Va0 < 0")
   if(Ve < 0) stop("ERROR: Ve < 0")
-  if(!f.rs %in% c(TRUE, FALSE)) stop("ERROR: f.rs should be TRUE or FALSE.")
-  if(!m.rs %in% c(TRUE, FALSE)) stop("ERROR: m.rs should be TRUE or FALSE.")
+  if(!fsel %in% c("R","P","PA")) stop("ERROR: fsel should be R or P or PA.")
+  if(!msel %in% c("R","P","PA")) stop("ERROR: msel should be R or P or PA.")
   # F0
   ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P")
   ped = data.frame(ID=1:F0size,
@@ -119,8 +120,8 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
   if(ngen > 1) {
     for(i in 2:ngen)
     {
-      sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1, c("ID","P")]
-      dams  = ped[ped$SEX=="f" & ped$GEN %in% (-overlap.d:0)+i-1, c("ID","P")]
+      sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1, c("ID","SBV","DBV","P")]
+      dams  = ped[ped$SEX=="f" & ped$GEN %in% (-overlap.d:0)+i-1, c("ID","SBV","DBV","P")]
       # Mortality before maturity
       if(mort.rate > 0) {
         nm = round((1-mort.rate)*nrow(sires))
@@ -132,18 +133,22 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
       # Selection on males
       nm = round(m.rate*nrow(sires))
       if(nm==0) stop("ERROR: No male left. Generation ", i)
-      if(m.rs) {
+      if(msel=="R") {
         sires = sires[sample(1:nrow(sires), nm),]
-      } else {
+      } else if(msel=="P") {
         sires = sires[order(-sires$P),][1:nm,]
+      } else {
+        sires = sires[order(-sires$SBV -sires$DBV),][1:nm,]
       }
       sires = sires$ID
       # Selection on females
       nf = round(f.rate*nrow(dams))
-      if(f.rs) {
+      if(fsel=="R") {
         dams = dams[sample(1:nrow(dams), nf),]
-      } else {
+      } else if(fsel=="P") {
         dams = dams[order(-dams$P),][1:nf,]
+      } else {
+        dams = dams[order(-dams$SBV -dams$DBV),][1:nf,]
       }
       dams = dams$ID
       # Set mates
@@ -219,5 +224,7 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
   ped = ped[,c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P")]
   # Re-base P
   ped$P = ped$P - 2*min(ped$P)
+  ped = ped[order(ped$ID),]
+  rownames(ped) = 1:nrow(ped)
   return(ped)
 }
