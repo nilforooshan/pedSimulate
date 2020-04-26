@@ -8,7 +8,7 @@
 #'
 #' @param m.rate : Proportion of males (\code{<= f.rate}) selected as sires, default = 1.
 #'
-#' @param mort.rate : Mortality rate after the availability of phenotype (e.g., birth weight, weaning weight) and before the age of maturity (i.e., before mating), default = 0.
+#' @param mort.rate : Mortality rate per generation, after the availability of phenotype (e.g., birth weight, weaning weight) and before the age of maturity (i.e., before mating), default = 0. Maximum \code{mort.rate} = 0.5.
 #'
 #' @param littersize : Litter size, default = 1.
 #'
@@ -91,7 +91,7 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
   if(!fsel %in% c("R","P","PA")) stop("ERROR: fsel should be R or P or PA.")
   if(!msel %in% c("R","P","PA")) stop("ERROR: msel should be R or P or PA.")
   # F0
-  ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P")
+  ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P","DEAD")
   ped = data.frame(ID=1:F0size,
                    SIRE=0,
                    DAM=0,
@@ -102,6 +102,7 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
                    MS=rnorm(F0size, 0, sqrt(Va0)),
                    E=rnorm(F0size, 0, sqrt(Ve)))
   ped$P = ped$MS + ped$E
+  ped$DEAD = FALSE
   # F1
   tmp = data.frame(ID=(1:(F0size*littersize/2))+F0size,
                    SIRE=rep(ped[ped$SEX=="m",]$ID, littersize),
@@ -115,21 +116,19 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
   tmp$MS=rnorm(nrow(tmp), 0, sqrt(Va0/2))
   tmp$E=rnorm(nrow(tmp), 0, sqrt(Ve))
   tmp$P = (tmp$SBV + tmp$DBV)/2 + tmp$MS + tmp$E
+  tmp$DEAD = FALSE
   ped = rbind(ped, tmp[,ordcol])
   # Fi (i>1)
   if(ngen > 1) {
     for(i in 2:ngen)
     {
-      sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1, c("ID","SBV","DBV","P")]
-      dams  = ped[ped$SEX=="f" & ped$GEN %in% (-overlap.d:0)+i-1, c("ID","SBV","DBV","P")]
       # Mortality before maturity
       if(mort.rate > 0) {
-        nm = round((1-mort.rate)*nrow(sires))
-        nf = round((1-mort.rate)*nrow(dams))
-        if(nm==0) stop("ERROR: No male left. Generation ", i)
-        sires = sires[sample(1:nrow(sires), nm),]
-        dams   = dams[sample(1:nrow(dams),  nf),]
+        ndead = round(mort.rate*nrow(ped[ped$GEN==(i-1),]))
+        ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
       }
+      sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
+      dams  = ped[ped$SEX=="f" & ped$GEN %in% (-overlap.d:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
       # Selection on males
       nm = round(m.rate*nrow(sires))
       if(nm==0) stop("ERROR: No male left. Generation ", i)
@@ -171,7 +170,6 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
           }
         }
       }
-      #//NOTE: Very unlikely, but if the number of fullsib matings did not decrease to 0, SIRE in the remaining fullsib matings is set to 0 at the end.
       # Avoid parent-progeny matings
       if(!parentprogeny) {
         pp.mate = pp_mate_finder(tmp, ped[,1:3])
@@ -186,8 +184,6 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
           }
         }
       }
-      #//NOTE: Very unlikely, but if the number of parent-progeny matings did not decrease to 0, SIRE in the remaining parent-progeny matings is set to 0 at the end.
-      #//NOTE: Very unlikely, but if a parent-progeny mating is replaced with a fullsib mating, SIRE in the full-sib mating is set 0 at the end.
       # Append the next generation
       tmp = data.frame(SIRE=rep(tmp$SIRE, littersize), DAM=rep(tmp$DAM, littersize))
       tmp$ID = (1:nrow(tmp))+nrow(ped)
@@ -200,6 +196,7 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
       tmp$MS=rnorm(nrow(tmp), 0, sqrt(Va0/2))
       tmp$E=rnorm(nrow(tmp), 0, sqrt(Ve))
       tmp$P = (tmp$SBV + tmp$DBV)/2 + tmp$MS + tmp$E
+      tmp$DEAD = FALSE
       ped = rbind(ped, tmp[,ordcol])
     }
   }

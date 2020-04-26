@@ -28,7 +28,7 @@ simulatePed(
 
 \item{m.rate}{: Proportion of males (\code{<= f.rate}) selected as sires, default = 1.}
 
-\item{mort.rate}{: Mortality rate after the availability of phenotype (e.g., birth weight, weaning weight) and before the age of maturity (i.e., before mating), default = 0.}
+\item{mort.rate}{: Mortality rate per generation, after the availability of phenotype (e.g., birth weight, weaning weight) and before the age of maturity (i.e., before mating), default = 0. Maximum \code{mort.rate} = 0.5.}
 
 \item{littersize}{: Litter size, default = 1.}
 
