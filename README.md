@@ -1,6 +1,6 @@
 # R package 'pedSimulate'
 
-Simulate Pedigree, genetic merits and phenotypes with random mating followed by (non)random selection differntly for males and females.
+SSimulate pedigree, genetic merits and phenotypes with (non)random mating followed by (non)random selection with different patterns in males and females.
 
 ## Installation
 
@@ -36,6 +36,9 @@ Arguments are provided for the following:
 - Environment (plus residual) variance
 - (non)random selection on females
 - (non)random selection on males
+
+Function `simulatePed` is used for simulating random mating of selected individuals, and
+function `assortative` is used for simulating assortatively/disassortatively mating of selected individuals.
 
 ### For details, please read the PDF manual.
 
