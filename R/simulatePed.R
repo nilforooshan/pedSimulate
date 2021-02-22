@@ -148,7 +148,7 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
             nm = round(m.rate*nrow(sires))
             if(nm==0) stop("ERROR: No male left. Generation ", i)
             if(msel=="R") {
-                sires = sires[sample(1:nrow(sires), nm),]
+                sires = sires[sample(1:nrow(sires), nm),]$ID
             } else if(msel=="P") {
                 sires = sires[order(-sires$P),]$ID[1:nm]
             } else if(msel=="PA") {
@@ -161,7 +161,7 @@ simulatePed <- function(F0size, f.rate=1, m.rate=1, mort.rate=0, littersize=1, n
             # Selection on females
             nf = round(f.rate*nrow(dams))
             if(fsel=="R") {
-                dams = dams[sample(1:nrow(dams), nf),]
+                dams = dams[sample(1:nrow(dams), nf),]$ID
             } else if(fsel=="P") {
                 dams = dams[order(-dams$P),]$ID[1:nf]
             } else if(fsel=="PA") {

@@ -10,3 +10,8 @@
 
 * Added function `assortative` for assortative/disassortative mating.
 * Added `"-P"` and `"-PA"` to arguments `fsel` and `msel` to select in opposite directions of `"P"` (phenotype) and `"PA"` (parent average).
+
+## Version: 0.1.2
+
+* Debugged the bug introduced in the previous version in the `simulatePed` function.
+
