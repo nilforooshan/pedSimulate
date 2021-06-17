@@ -1,6 +1,6 @@
 # R package 'pedSimulate'
 
-SSimulate pedigree, genetic merits and phenotypes with (non)random mating followed by (non)random selection with different patterns in males and females.
+Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings followed by random/non-random selection of males and females with similar/different patterns in males and females.
 
 ## Installation
 
@@ -18,27 +18,32 @@ devtools::install_github('nilforooshan/pedSimulate')
 
 ## Description
 
-An R package for simulating a pedigree with genetic merits and phenotypes, starting from a base population (generation 0).
+An R package for simulating a pedigree with genetic merits and phenotypes, starting from a base population (generation 0) or an existing pedigree.
 The pedigree depth and design can be chosen by the values provided to the arguments of the simulation function.
 Arguments are provided for the following: 
 
-- Number of founder animals
-- Proportion of females selected as dams
-- Proportion of males selected as sires
-- Mortality rate
+- Number of founder animals or an initial pedigree
+- Additive genetic variance in the base generation
+- Residual variance
 - Litter size
 - Number of generations to simulate
-- Number of generation overlaps for sires
-- Number of generation overlaps for dams
-- Choice of avoiding fullsib matings
-- Choice of avoiding parent-progeny matings
-- Additive genetic variance in the base generation
-- Environment (plus residual) variance
-- (non)random selection on females
-- (non)random selection on males
+- Mortality rate
+- Number of overlapping generations for sires
+- Number of overlapping generations for dams
+- Proportion of females selected as dams
+- Proportion of males selected as sires
+- Selection strategy for females
+- Selection strategy for males
 
-Function `simulatePed` is used for simulating random mating of selected individuals, and
-function `assortative` is used for simulating assortatively/disassortatively mating of selected individuals.
+Function `simulatePed` is for simulating a pedigree from a base population.
+
+Function `appendPed` is for simulating new generations from an existing pedigree and appending to it.
+
+Function `fs_mate_finder` is for finding fullsib matings in the pedigree.
+
+Function `hs_mate_finder` is for finding halfsib matings in the pedigree.
+
+Function `pp_mate_finder` is for finding parent-progeny matings in the pedigree.
 
 ### For details, please read the PDF manual.
 

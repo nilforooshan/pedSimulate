@@ -15,3 +15,11 @@
 
 * Debugged the bug introduced in the previous version in the `simulatePed` function.
 
+## Version: 1.0.0
+
+* Major revision
+* Functions `simulatePed` and `assortative` were combined into `simulatePed`, and arguments `fullsib` and `parentprogeny` were removed.
+* Added function `appendPed` for simulating new generations from an existing pedigree and appending to it.
+* Added function `fs_mate_finder` for finding fullsib matings in the pedigree.
+* Added function `hs_mate_finder` for finding halfsib matings in the pedigree.
+* Added function `pp_mate_finder` for finding parent-progeny matings in the pedigree.
