@@ -170,7 +170,7 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
                 dams = dams[order(dams$SBV + dams$DBV),]$ID[1:nf]
             }
             # Set mates
-            SIRES = c(rep(sires, each=floor(nf/nm)), sires[1:(nf-length(sires)*floor(nf/nm))])
+            SIRES = c(rep(sires, each=floor(nf/nm)), sires[0:(nf-length(sires)*floor(nf/nm))])
             SIRES = SIRES[order(match(SIRES, sires))]
             tmp = data.frame(SIRE=SIRES, DAM=dams)
             # Append the next generation

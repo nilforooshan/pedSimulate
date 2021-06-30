@@ -23,3 +23,7 @@
 * Added function `fs_mate_finder` for finding fullsib matings in the pedigree.
 * Added function `hs_mate_finder` for finding halfsib matings in the pedigree.
 * Added function `pp_mate_finder` for finding parent-progeny matings in the pedigree.
+
+## Version: 1.0.1
+
+* Made a small debug.
