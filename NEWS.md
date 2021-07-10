@@ -27,3 +27,7 @@
 ## Version: 1.0.1
 
 * Made a small debug.
+
+## Version: 1.1.0
+
+* Added agrumnts `f.order` and `m.order` to `simulatePed` and `appendPed` functions.

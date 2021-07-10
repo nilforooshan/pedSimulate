@@ -16,7 +16,9 @@ appendPed(
   f.rate = 1,
   m.rate = 1,
   fsel = "R",
-  msel = "R"
+  msel = "R",
+  f.order = "fsel",
+  m.order = "msel"
 )
 }
 \arguments{
@@ -34,7 +36,7 @@ If this condition is not met, PA - (SBV + DBV)/2 is added to MS and (SBV + DBV)/
 
 \item{littersize}{: Litter size, default = 1.}
 
-\item{ngen}{: Number of generations to simulate.}
+\item{ngen}{: Number of generations to simulate after the founder generation.}
 
 \item{mort.rate}{: Mortality rate per generation, after the availability of phenotype (e.g., birth weight, weaning weight)
 and before the age of maturity (i.e., before mating), default = 0. Maximum \code{mort.rate} = 0.5.}
@@ -56,13 +58,27 @@ if \code{"PA"}, selection on true parent averages.
  if \code{"P"}, selection on phenotypes or true breeding values if \code{Ve} = 0;
 if \code{"PA"}, selection on true parent averages.
 \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
+
+\item{f.order}{: Ordering selected females for mating;
+if \code{"fsel"} (default), same as the selection order;
+if \code{"R"} random ordering;
+if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+if \code{"PA"}, ordering based on true parent averages.
+\code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
+
+\item{m.order}{: Ordering selected males for mating;
+if \code{"msel"} (default), same as the selection order;
+if \code{"R"} random ordering;
+if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+if \code{"PA"}, ordering based on true parent averages.
+\code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
 }
 \value{
 ped2 : The output pedigree \code{data.frame} with the same format as the input pedigree \code{data.frame}.
 }
 \description{
 Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings
-followed by random/non-random selection of males and females with similar/different patterns in males and females,
+followed by random/non-random selection of males and females with similar/different selection patterns in males and females,
 starting from an existing pedigree.
 }
 \examples{
@@ -92,7 +108,9 @@ ped2 = appendPed(
     f.rate = 0.8,
     m.rate = 0.5,
     fsel = "R",
-    msel = "R"
+    msel = "R",
+    f.order = "P",
+    m.order = "PA"
 )
 
 }

@@ -1,7 +1,7 @@
 #' @title Simulate pedigree, genetic merits and phenotypes
 #'
 #' @description Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings
-#' followed by random/non-random selection of males and females with similar/different patterns in males and females.
+#' followed by random/non-random selection of males and females with similar/different selection patterns in males and females.
 #'
 #' @param F0size : Even number of founder animals. No mortality, selection and non-random mating in this generation.
 #'
@@ -11,7 +11,7 @@
 #'
 #' @param littersize : Litter size, default = 1.
 #'
-#' @param ngen : Number of generations to simulate.
+#' @param ngen : Number of generations to simulate after the founder generation.
 #'
 #' @param mort.rate : Mortality rate per generation, after the availability of phenotype (e.g., birth weight, weaning weight)
 #' and before the age of maturity (i.e., before mating), default = 0. Maximum \code{mort.rate} = 0.5.
@@ -34,6 +34,20 @@
 #' if \code{"PA"}, selection on true parent averages.
 #' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
 #'
+#' @param f.order : Ordering selected females for mating;
+#' if \code{"fsel"} (default), same as the selection order;
+#' if \code{"R"} random ordering;
+#' if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+#' if \code{"PA"}, ordering based on true parent averages.
+#' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
+#'
+#' @param m.order : Ordering selected males for mating;
+#' if \code{"msel"} (default), same as the selection order;
+#' if \code{"R"} random ordering;
+#' if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+#' if \code{"PA"}, ordering based on true parent averages.
+#' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
+#'
 #' @return ped : The output pedigree \code{data.frame}. Further information provided in \strong{Details}.
 #'
 #' @details
@@ -41,8 +55,8 @@
 #' GEN (generation number starting with 0 for the base generation), PA (parent average),
 #' MS (Mendelian Sampling), E (environment and residuals), and P (phenotype).
 #'
-#' Assortative and disassortative matings can be simulated with different combinations of
-#' \code{fsel} and \code{msel}, where both parameters are not set to \code{"R"}.
+#' Random, assortative, and disassortative matings can be simulated with different combinations of
+#' \code{fsel}, \code{msel}, \code{f.order}, and \code{m.order}.
 #'
 #' @examples
 #' ped = simulatePed(
@@ -57,11 +71,13 @@
 #'     f.rate = 0.8,
 #'     m.rate = 0.5,
 #'     fsel = "P",
-#'     msel = "PA"
+#'     msel = "PA",
+#'     f.order = "fsel",
+#'     m.order = "msel"
 #' )
 #'
 #' @export
-simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0, overlap.d=0, f.rate=1, m.rate=1, fsel="R", msel="R") {
+simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0, overlap.d=0, f.rate=1, m.rate=1, fsel="R", msel="R", f.order="fsel", m.order="msel") {
     # Check inputs
     ## Check F0size
     F0size = round(F0size)
@@ -99,6 +115,27 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
     if(!fsel %in% c("R","P","PA","-P","-PA")) stop('ERROR: fsel should be "R", "P", "PA", "-P" or "-PA".')
     ## Check msel
     if(!msel %in% c("R","P","PA","-P","-PA")) stop('ERROR: msel should be "R", "P", "PA", "-P" or "-PA".')
+    ## Check f.order
+    if(!f.order %in% c("fsel", "R","P","PA","-P","-PA")) stop('ERROR: f.order should be "fsel", "R", "P", "PA", "-P" or "-PA".')
+    if(f.order=="fsel") f.order = fsel
+    ## Check m.order
+    if(!m.order %in% c("msel", "R","P","PA","-P","-PA")) stop('ERROR: m.order should be "msel", "R", "P", "PA", "-P" or "-PA".')
+    if(m.order=="msel") m.order = msel
+    ## Report what you got
+    message("F0size = ", F0size, "\n",
+            "Va0 = ", Va0, "\n",
+            "Ve = ", Ve, "\n",
+            "littersize = ", littersize, "\n",
+            "ngen = ", ngen, "\n",
+            "mort.rate = ", mort.rate, "\n",
+            "overlap.s = ", overlap.s, "\n",
+            "overlap.d = ", overlap.d, "\n",
+            "f.rate = ", f.rate, "\n",
+            "m.rate = ", m.rate, "\n",
+            "fsel = ", fsel, "\n",
+            "msel = ", msel, "\n",
+            "f.order = ", f.order, "\n",
+            "m.order = ", m.order)
     # F0
     ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P","DEAD")
     ped = data.frame(ID=1:F0size,
@@ -168,6 +205,36 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
                 dams = dams[order(dams$P),]$ID[1:nf]
             } else if(fsel=="-PA") {
                 dams = dams[order(dams$SBV + dams$DBV),]$ID[1:nf]
+            }
+            # Order males
+            if(m.order!=msel) {
+                sires = ped[ped$ID %in% sires,]
+                if(m.order=="R") {
+                    sires = sample(sires$ID)
+                } else if(m.order=="P") {
+                    sires = sires[order(-sires$P),]$ID
+                } else if(m.order=="PA") {
+                    sires = sires[order(-sires$SBV -sires$DBV),]$ID
+                } else if(m.order=="-P") {
+                    sires = sires[order(sires$P),]$ID
+                } else if(m.order=="-PA") {
+                    sires = sires[order(sires$SBV + sires$DBV),]$ID
+                }
+            }
+            # Order females
+            if(f.order!=fsel) {
+                dams = ped[ped$ID %in% dams,]
+                if(f.order=="R") {
+                    dams = sample(dams$ID)
+                } else if(f.order=="P") {
+                    dams = dams[order(-dams$P),]$ID
+                } else if(f.order=="PA") {
+                    dams = dams[order(-dams$SBV -dams$DBV),]$ID
+                } else if(f.order=="-P") {
+                    dams = dams[order(dams$P),]$ID
+                } else if(f.order=="-PA") {
+                    dams = dams[order(dams$SBV + dams$DBV),]$ID
+                }
             }
             # Set mates
             SIRES = c(rep(sires, each=floor(nf/nm)), sires[0:(nf-length(sires)*floor(nf/nm))])

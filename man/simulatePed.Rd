@@ -16,7 +16,9 @@ simulatePed(
   f.rate = 1,
   m.rate = 1,
   fsel = "R",
-  msel = "R"
+  msel = "R",
+  f.order = "fsel",
+  m.order = "msel"
 )
 }
 \arguments{
@@ -28,7 +30,7 @@ simulatePed(
 
 \item{littersize}{: Litter size, default = 1.}
 
-\item{ngen}{: Number of generations to simulate.}
+\item{ngen}{: Number of generations to simulate after the founder generation.}
 
 \item{mort.rate}{: Mortality rate per generation, after the availability of phenotype (e.g., birth weight, weaning weight)
 and before the age of maturity (i.e., before mating), default = 0. Maximum \code{mort.rate} = 0.5.}
@@ -50,21 +52,35 @@ if \code{"PA"}, selection on true parent averages.
  if \code{"P"}, selection on phenotypes or true breeding values if \code{Ve} = 0;
 if \code{"PA"}, selection on true parent averages.
 \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
+
+\item{f.order}{: Ordering selected females for mating;
+if \code{"fsel"} (default), same as the selection order;
+if \code{"R"} random ordering;
+if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+if \code{"PA"}, ordering based on true parent averages.
+\code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
+
+\item{m.order}{: Ordering selected males for mating;
+if \code{"msel"} (default), same as the selection order;
+if \code{"R"} random ordering;
+if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+if \code{"PA"}, ordering based on true parent averages.
+\code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
 }
 \value{
 ped : The output pedigree \code{data.frame}. Further information provided in \strong{Details}.
 }
 \description{
 Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings
-followed by random/non-random selection of males and females with similar/different patterns in males and females.
+followed by random/non-random selection of males and females with similar/different selection patterns in males and females.
 }
 \details{
 The output pedigree \code{data.frame} (\code{ped}) has 9 columns: ID, SIRE, DAM, SEX,
 GEN (generation number starting with 0 for the base generation), PA (parent average),
 MS (Mendelian Sampling), E (environment and residuals), and P (phenotype).
 
-Assortative and disassortative matings can be simulated with different combinations of
-\code{fsel} and \code{msel}, where both parameters are not set to \code{"R"}.
+Random, assortative, and disassortative matings can be simulated with different combinations of
+\code{fsel}, \code{msel}, \code{f.order}, and \code{m.order}.
 }
 \examples{
 ped = simulatePed(
@@ -79,7 +95,9 @@ ped = simulatePed(
     f.rate = 0.8,
     m.rate = 0.5,
     fsel = "P",
-    msel = "PA"
+    msel = "PA",
+    f.order = "fsel",
+    m.order = "msel"
 )
 
 }

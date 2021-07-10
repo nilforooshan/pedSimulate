@@ -16,9 +16,8 @@
 #' No selection (natural or artificial) and non-random mating is applied to this population.
 #' Alternatively, the simulation can be started from an existing pedigree.
 #' Natural (mortality) and artificial selection are applied to the next generations.
-#' Different generation overlap, and selection intensities and patterns can be applied to males and females.
-#' Selected individuals are mated randomly or assortatively/disassortatively, 
-#' based on different selection criteria applied to males and females, independently.
+#' Different generation overlap, selection intensities and selection patterns can be applied to males and females.
+#' Selected males and females are oredered similarly/diffrently to simulate various random, assortative or disassortative mating scenarios.
 #' Performance and genetic merit of individuals are simulated using the basic rules of quantitative genetics.
 #' The performance (P) of an individual is influenced by genetic (A) and environmental (E) effects.
 #' Thus, P = A + E, and Var(P) = Var(A) + Var(E).

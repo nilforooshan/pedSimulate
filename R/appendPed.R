@@ -1,7 +1,7 @@
 #' @title Simulate new generations from an existing pedigree
 #'
 #' @description Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings
-#' followed by random/non-random selection of males and females with similar/different patterns in males and females,
+#' followed by random/non-random selection of males and females with similar/different selection patterns in males and females,
 #' starting from an existing pedigree.
 #'
 #' @param ped : The input pedigree \code{data.frame} with 9 columns: ID, SIRE, DAM, SEX,
@@ -18,7 +18,7 @@
 #'
 #' @param littersize : Litter size, default = 1.
 #'
-#' @param ngen : Number of generations to simulate.
+#' @param ngen : Number of generations to simulate after the founder generation.
 #'
 #' @param mort.rate : Mortality rate per generation, after the availability of phenotype (e.g., birth weight, weaning weight)
 #' and before the age of maturity (i.e., before mating), default = 0. Maximum \code{mort.rate} = 0.5.
@@ -39,6 +39,20 @@
 #' @param msel : If \code{"R"} (default), random selection on males;
 #'  if \code{"P"}, selection on phenotypes or true breeding values if \code{Ve} = 0;
 #' if \code{"PA"}, selection on true parent averages.
+#' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
+#'
+#' @param f.order : Ordering selected females for mating;
+#' if \code{"fsel"} (default), same as the selection order;
+#' if \code{"R"} random ordering;
+#' if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+#' if \code{"PA"}, ordering based on true parent averages.
+#' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
+#'
+#' @param m.order : Ordering selected males for mating;
+#' if \code{"msel"} (default), same as the selection order;
+#' if \code{"R"} random ordering;
+#' if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
+#' if \code{"PA"}, ordering based on true parent averages.
 #' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
 #'
 #' @return ped2 : The output pedigree \code{data.frame} with the same format as the input pedigree \code{data.frame}.
@@ -70,11 +84,13 @@
 #'     f.rate = 0.8,
 #'     m.rate = 0.5,
 #'     fsel = "R",
-#'     msel = "R"
+#'     msel = "R",
+#'     f.order = "P",
+#'     m.order = "PA"
 #' )
 #'
 #' @export
-appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0, overlap.d=0, f.rate=1, m.rate=1, fsel="R", msel="R") {
+appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0, overlap.d=0, f.rate=1, m.rate=1, fsel="R", msel="R", f.order="fsel", m.order="msel") {
     # Check inputs
     ## Check ped
     if(!identical(colnames(ped), c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P"))) stop('ERROR: colnames(ped) is not c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P")')
@@ -110,6 +126,27 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
     if(!fsel %in% c("R","P","PA","-P","-PA")) stop('ERROR: fsel should be "R", "P", "PA", "-P" or "-PA".')
     ## Check msel
     if(!msel %in% c("R","P","PA","-P","-PA")) stop('ERROR: msel should be "R", "P", "PA", "-P" or "-PA".')
+    ## Check f.order
+    if(!f.order %in% c("fsel", "R","P","PA","-P","-PA")) stop('ERROR: f.order should be "fsel", "R", "P", "PA", "-P" or "-PA".')
+    if(f.order=="fsel") f.order = fsel
+    ## Check m.order
+    if(!m.order %in% c("msel", "R","P","PA","-P","-PA")) stop('ERROR: m.order should be "msel", "R", "P", "PA", "-P" or "-PA".')
+    if(m.order=="msel") m.order = msel
+    ## Report what you got
+    message("ped has ", nrow(ped), " rows.\n",
+            "Va0 = ", Va0, "\n",
+            "Ve = ", Ve, "\n",
+            "littersize = ", littersize, "\n",
+            "ngen = ", ngen, "\n",
+            "mort.rate = ", mort.rate, "\n",
+            "overlap.s = ", overlap.s, "\n",
+            "overlap.d = ", overlap.d, "\n",
+            "f.rate = ", f.rate, "\n",
+            "m.rate = ", m.rate, "\n",
+            "fsel = ", fsel, "\n",
+            "msel = ", msel, "\n",
+            "f.order = ", f.order, "\n",
+            "m.order = ", m.order)
     ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P","DEAD")
     # Process the input pedigree
     ped$BV = ped$PA + ped$MS
@@ -176,6 +213,36 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
             dams = dams[order(dams$P),]$ID[1:nf]
         } else if(fsel=="-PA") {
             dams = dams[order(dams$SBV + dams$DBV),]$ID[1:nf]
+        }
+        # Order males
+        if(m.order!=msel) {
+            sires = ped[ped$ID %in% sires,]
+            if(m.order=="R") {
+                sires = sample(sires$ID)
+            } else if(m.order=="P") {
+                sires = sires[order(-sires$P),]$ID
+            } else if(m.order=="PA") {
+                sires = sires[order(-sires$SBV -sires$DBV),]$ID
+            } else if(m.order=="-P") {
+                sires = sires[order(sires$P),]$ID
+            } else if(m.order=="-PA") {
+                sires = sires[order(sires$SBV + sires$DBV),]$ID
+            }
+        }
+        # Order females
+        if(f.order!=fsel) {
+            dams = ped[ped$ID %in% dams,]
+            if(f.order=="R") {
+                dams = sample(dams$ID)
+            } else if(f.order=="P") {
+                dams = dams[order(-dams$P),]$ID
+            } else if(f.order=="PA") {
+                dams = dams[order(-dams$SBV -dams$DBV),]$ID
+            } else if(f.order=="-P") {
+                dams = dams[order(dams$P),]$ID
+            } else if(f.order=="-PA") {
+                dams = dams[order(dams$SBV + dams$DBV),]$ID
+            }
         }
         # Set mates
         SIRES = c(rep(sires, each=floor(nf/nm)), sires[1:(nf-length(sires)*floor(nf/nm))])
