@@ -172,7 +172,7 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         for(i in (minGEN+1):maxGEN)
         {
             ndead = round(mort.rate*nrow(ped[ped$GEN==(i-1),]))
-            ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
+            if(ndead > 0) ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
         }
     }
     # Simulating the next generations
@@ -182,7 +182,7 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         # Mortality after maturity is applied via overlap.s & overlap.d
         if(mort.rate > 0) {
             ndead = round(mort.rate*nrow(ped[ped$GEN==(i-1),]))
-            ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
+            if(ndead > 0) ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
         }
         # Find selection candidates
         sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
@@ -218,7 +218,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         if(m.order!=msel) {
             sires = ped[ped$ID %in% sires,]
             if(m.order=="R") {
-                sires = sample(sires$ID)
+                if(nrow(sires) > 1) {
+                    sires = sample(sires$ID)
+                } else {
+                    sires = sires$ID
+                }
             } else if(m.order=="P") {
                 sires = sires[order(-sires$P),]$ID
             } else if(m.order=="PA") {
@@ -233,7 +237,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         if(f.order!=fsel) {
             dams = ped[ped$ID %in% dams,]
             if(f.order=="R") {
-                dams = sample(dams$ID)
+                if(nrow(dams) > 1) {
+                    dams = sample(dams$ID)
+                } else {
+                    dams = dams$ID
+                }
             } else if(f.order=="P") {
                 dams = dams[order(-dams$P),]$ID
             } else if(f.order=="PA") {

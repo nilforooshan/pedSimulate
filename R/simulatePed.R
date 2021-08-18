@@ -152,8 +152,12 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
     message("Started with a base generation of ", F0size, " individuals.")
     # F1
     tmp = data.frame(ID=(1:(F0size*littersize/2))+F0size,
-                     SIRE=rep(ped[ped$SEX=="m",]$ID, littersize),
-                     DAM=rep(sample(ped[ped$SEX=="f",]$ID), each=littersize))
+                     SIRE=rep(ped[ped$SEX=="m",]$ID, littersize))
+    if(nrow(ped[ped$SEX=="f",]) > 1) {
+        tmp$DAM = rep(sample(ped[ped$SEX=="f",]$ID), each=littersize)
+    } else {
+        tmp$DAM = rep(ped[ped$SEX=="f",]$ID, littersize)
+    }
     tmp = merge(tmp, ped[,c("ID","SBV","DBV","MS")], by.x="SIRE", by.y="ID")
     tmp = merge(tmp, ped[,c("ID","SBV","DBV","MS")], by.x="DAM",  by.y="ID")
     tmp$SBV = (tmp$SBV.x + tmp$DBV.x)/2 + tmp$MS.x
@@ -174,7 +178,7 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
             # Mortality after maturity is applied via overlap.s & overlap.d
             if(mort.rate > 0) {
                 ndead = round(mort.rate*nrow(ped[ped$GEN==(i-1),]))
-                ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
+                if(ndead > 0) ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
             }
             # Find selection candidates
             sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
@@ -210,7 +214,11 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
             if(m.order!=msel) {
                 sires = ped[ped$ID %in% sires,]
                 if(m.order=="R") {
-                    sires = sample(sires$ID)
+                    if(nrow(sires) > 1) {
+                        sires = sample(sires$ID)
+                    } else {
+                        sires = sires$ID
+                    }                    
                 } else if(m.order=="P") {
                     sires = sires[order(-sires$P),]$ID
                 } else if(m.order=="PA") {
@@ -225,7 +233,11 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
             if(f.order!=fsel) {
                 dams = ped[ped$ID %in% dams,]
                 if(f.order=="R") {
-                    dams = sample(dams$ID)
+                    if(nrow(dams) > 1) {
+                        dams = sample(dams$ID)
+                    } else {
+                        dams = dams$ID
+                    }
                 } else if(f.order=="P") {
                     dams = dams[order(-dams$P),]$ID
                 } else if(f.order=="PA") {
