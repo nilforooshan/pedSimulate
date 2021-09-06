@@ -1,8 +1,8 @@
 Package: pedSimulate
-Title: Pedigree, Genetic Merit and Phenotype Simulation
-Version: 1.1.1
+Title: Pedigree, Genetic Merit, Phenotype, and Genotype Simulation
+Version: 1.2.0
 Authors@R: person("Mohammad Ali", "Nilforooshan", email="m.a.nilforooshan@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0339-5442"))
-Description: Simulate pedigree, genetic merits and phenotypes with random/non-random matings followed by random/non-random selection with different intensities and patterns in males and females.
+Description: Simulate pedigree, genetic merits and phenotypes with random/non-random matings followed by random/non-random selection with different intensities and patterns in males and females. Genotypes can be simulated for a given pedigree.
    Bijma, P. & Rutten, M. (2002) <https://www.wur.nl/en/Research-Results/Chair-groups/Animal-Sciences/Animal-Breeding-and-Genomics-Group/Research/Software.htm>.
 License: GPL-3
 LazyData: true

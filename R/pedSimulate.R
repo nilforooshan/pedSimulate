@@ -1,4 +1,4 @@
-#' @title Pedigree, genetic merit and phenotype simulation
+#' @title Pedigree, genetic merit, phenotype, and genotype simulation
 #'
 #' @docType package
 #'
@@ -9,6 +9,8 @@
 #' @description
 #' An R package for simulating a pedigree with genetic merits and phenotypes, starting from a base population (generation 0) or an existing pedigree.
 #' The pedigree depth and design can be chosen by the values provided to the arguments of the simulation function.
+#' Genotypes can be simulated for a given pedigree.
+#' Marker effects to be chosen by the researcher.
 #'
 #' @details
 #' Starting from a base population with a user-defined size and equal number of males and females,
@@ -28,4 +30,7 @@
 #' Because there is no provided information for environmental effects, the environment effect is
 #' assigned to individuals from a normal distribution of random numbers (E ~ N(0, \strong{I}Var(E))).
 #' The package also provides functions to identify halfsib, fullsib and parent-progeny matings in the pedigree.
+#' For a given pedigree, genotypes can be simulated.
+#' Marker effects can be chosen by the researcher and added to the simulated phenotypes.
+#' In that case, genetic effects and variance used to simulate phenotypes change to residual polygenic effects and variance (genetic effects and variance not explained by the markers).
 NULL

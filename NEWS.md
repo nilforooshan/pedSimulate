@@ -35,3 +35,7 @@
 ## Version: 1.1.1
 
 * Debugged for sampling from a sample size of 1.
+
+## Version: 1.2.0
+
+* Added function `simulateGen` for simulating genotypes.
