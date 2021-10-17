@@ -39,3 +39,7 @@
 ## Version: 1.2.0
 
 * Added function `simulateGen` for simulating genotypes.
+
+## Version: 1.2.1
+
+* Fixed a small bug in `hs_mate_finder`.

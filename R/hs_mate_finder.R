@@ -25,6 +25,6 @@ hs_mate_finder <- function(ped) {
     hs_mates = hs_mates[hs_mates$MGS!=0 | hs_mates$MGD!=0,]
     hs_mates = hs_mates[(hs_mates$MGS!=0 & hs_mates$MGS==hs_mates$PGS) | (hs_mates$MGD!=0 & hs_mates$MGD==hs_mates$PGD),]
     # Discard fullsibs
-    hs_mates = hs_mates[hs_mates$PGS!=hs_mates$MGS | hs_mates$PGD!=hs_mates$MGD, c("SIRE","DAM")]
+    hs_mates = hs_mates[hs_mates$MGS==0 | hs_mates$MGD==0 | hs_mates$MGS!=hs_mates$PGS | hs_mates$MGD!=hs_mates$PGD, c("SIRE","DAM")]
     return(hs_mates)
 }

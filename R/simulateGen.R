@@ -60,6 +60,7 @@ simulateGen <- function(ped, AF, mut.rate=0) {
         }
         if(!identical(mut.rate, 0)) tmp = mutate(tmp, mut.rate)
         M = rbind(M, tmp)
+        rownames(M) = NULL
     }
     return(M)
 }
