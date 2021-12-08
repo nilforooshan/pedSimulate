@@ -1,14 +1,16 @@
-#' @title Simulate genotypes
+#' @title Simulate genotypes for an appended pedigree
 #'
-#' @description Simulate genotypes for a given pedigree, allele frequency and mutation rate at each marker locus.
+#' @description Simulate genotypes for an appended pedigree to an existing pedigree with genotypes.
 #'
 #' @param ped : Pedigree \code{data.frame} with columns for animal, sire, and dam identification.
 #'
-#' @param AF : Vector of allele frequencies at different loci for the genotypes to be simulated. If no value is provided, it will be randomly sampled from a uniform distribution with min = 0.01 and max = 0.99.
+#' @param M : Genotype \code{data.frame} with rows corresponding to the initial rows of the pedigree and columns corresponding to markers.
+#'
+#' @param AF : Vector of allele frequencies at different loci for the genotypes to be simulated. If no value is provided, it will be estimated from \code{M}.
 #'
 #' @param mut.rate : Vector of mutation rates at different loci for the genotypes to be simulated, default = 0 for no mutation.
 #'
-#' @return M : The simulated genotype \code{data.frame} with rows corresponding to animals (in the same order as in the pedigree) and columns corresponding to markers.
+#' @return M2 : New simulated genotypes appended to \code{M}.
 #'
 #' @details
 #' Only diploid and bi-allelic situations are covered.
@@ -20,12 +22,17 @@
 #' mut.rate = runif(nSNP, 0, 10^-5)
 #' ped = data.frame(ID=1:5, SIRE=c(0,0,1,0,3), DAM=c(0,0,2,2,4))
 #' gen = simulateGen(ped, AF, mut.rate)
+#' ped = rbind(ped, data.frame(ID=6:8, SIRE=c(3,6,6), DAM=c(0,4,5)))
+#' gen = appendGen(ped, M=gen, AF)
 #'
 #' @export
-simulateGen <- function(ped, AF=c(), mut.rate=0) {
+appendGen <- function(ped, M, AF=c(), mut.rate=0) {
+    if(!identical(as.integer(ped[,1]), 1:nrow(ped))) stop("!identical(as.integer(ped[,1]), 1:nrow(ped)); Please consider renumberring the pedigree: ped[,1:3] <- ggroups::renum(ped[,1:3])$newped")
+    stopifnot(nrow(M) < nrow(ped))
+    if(nrow(M)==0) stop("The genotype matrix is empty. Please use function simulateGen.")
     colnames(ped) = c("ID","SIRE","DAM")
     if(length(AF)==0) {
-        AF = runif(ncol(M), min=0.01, max=0.99)
+        AF = colMeans(M)
     } else {
         stopifnot(min(AF)>=0.01)
         stopifnot(max(AF)<=0.99)
@@ -42,11 +49,8 @@ simulateGen <- function(ped, AF=c(), mut.rate=0) {
     }
     tmp = c()
     SNPs = 1:length(AF)
-    # Imputing the 1st genotype
-    for(j in SNPs) tmp = c(tmp, sample(0:2, 1, prob=c((1-AF[j])^2, 2*(1-AF[j])*AF[j], AF[j]^2)))
-    M = matrix(tmp, nrow=1)
-    # Imputing the next genotypes
-    for(i in 2:nrow(ped))
+    # Appending genotypes
+    for(i in (nrow(M)+1):nrow(ped))
     {
         s = ped$SIRE[i]
         d = ped$DAM[i]

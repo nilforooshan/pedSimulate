@@ -43,3 +43,8 @@
 ## Version: 1.2.1
 
 * Fixed a small bug in `hs_mate_finder`.
+
+## Version: 1.3.0
+
+* A major debug: `%in% (-overlap.s:0)+i-1` was performing differently from `%in% ((-overlap.s:0)+i-1)`, similarly `%in% (-overlap.d:0)+i-1` and `%in% ((-overlap.d:0)+i-1)`.
+* Added function `appendGen` for simulating genotypes for an appended pedigree to an existing pedigree with genotypes.

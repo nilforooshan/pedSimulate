@@ -7,17 +7,17 @@
 \description{
 An R package for simulating a pedigree with genetic merits and phenotypes, starting from a base population (generation 0) or an existing pedigree.
 The pedigree depth and design can be chosen by the values provided to the arguments of the simulation function.
-Genotypes can be simulated for a given pedigree.
+Genotypes can be simulated for a given pedigree, or an appended pedigree to an existing pedigree with genotypes.
 Marker effects to be chosen by the researcher.
 }
 \details{
 Starting from a base population with a user-defined size and equal number of males and females,
-next generations are simulated for the user-defined littersize and number of generations.
+next generations are simulated for the user-defined litter size and number of generations.
 No selection (natural or artificial) and non-random mating is applied to this population.
 Alternatively, the simulation can be started from an existing pedigree.
 Natural (mortality) and artificial selection are applied to the next generations.
 Different generation overlap, selection intensities and selection patterns can be applied to males and females.
-Selected males and females are oredered similarly/diffrently to simulate various random, assortative or disassortative mating scenarios.
+Selected males and females are ordered similarly/differently to simulate various random, assortative or disassortative mating scenarios.
 Performance and genetic merit of individuals are simulated using the basic rules of quantitative genetics.
 The performance (P) of an individual is influenced by genetic (A) and environmental (E) effects.
 Thus, P = A + E, and Var(P) = Var(A) + Var(E).

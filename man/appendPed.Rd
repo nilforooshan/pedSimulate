@@ -74,7 +74,7 @@ if \code{"PA"}, ordering based on true parent averages.
 \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
 }
 \value{
-ped2 : The output pedigree \code{data.frame} with the same format as the input pedigree \code{data.frame}.
+ped2 : New generations appended to the input pedigree \code{data.frame}.
 }
 \description{
 Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings

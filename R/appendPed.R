@@ -55,7 +55,7 @@
 #' if \code{"PA"}, ordering based on true parent averages.
 #' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
 #'
-#' @return ped2 : The output pedigree \code{data.frame} with the same format as the input pedigree \code{data.frame}.
+#' @return ped2 : New generations appended to the input pedigree \code{data.frame}.
 #'
 #' @examples
 #' ped = simulatePed(
@@ -94,6 +94,7 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
     # Check inputs
     ## Check ped
     if(!identical(colnames(ped), c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P"))) stop('ERROR: colnames(ped) is not c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P")')
+    if(!identical(as.integer(ped[,1]), 1:nrow(ped))) stop("!identical(as.integer(ped[,1]), 1:nrow(ped)); Please consider renumberring the pedigree: ped[,1:3] <- ggroups::renum(ped[,1:3])$newped")
     ## Check Va0
     if(Va0 <= 0) stop("ERROR: Va0 <= 0")
     ## Check Ve
@@ -110,11 +111,9 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
     ## Check overlap.s
     overlap.s = round(overlap.s)
     if(overlap.s < 0) stop("ERROR: overlap.s < 0")
-    if(overlap.s >= ngen) stop("ERROR: overlap.s >= ngen")
     ## Check overlap.d
     overlap.d = round(overlap.d)
     if(overlap.d < 0) stop("ERROR: overlap.d < 0")
-    if(overlap.d >= ngen) stop("ERROR: overlap.d >= ngen")
     ## Check f.rate
     if(f.rate > 1) stop("ERROR: f.rate > 1")
     if(f.rate <= 0) stop("ERROR: f.rate <= 0")
@@ -160,13 +159,13 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
     ped[is.na(ped$DBV),]$DBV = 0
     ped$MS = ped$MS + ped$PA - (ped$SBV + ped$DBV)/2
     ped$DEAD = FALSE
-    ped = ped[,ordcol]
     ped = ped[order(ped$ID),]
     maxGEN = max(ped$GEN)
     minGEN = min(ped$GEN)
     message("Started with a pedigree of ", nrow(ped), " individuals and maximum generation number ", maxGEN)
     # Find the population mean
     popmean = mean(ped$P - ped$PA - ped$MS - ped$E)
+    ped = ped[,ordcol]
     # Mortality before the last generation
     if(mort.rate > 0 & minGEN!=maxGEN) {
         for(i in (minGEN+1):maxGEN)
@@ -185,8 +184,8 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
             if(ndead > 0) ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
         }
         # Find selection candidates
-        sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
-        dams  = ped[ped$SEX=="f" & ped$GEN %in% (-overlap.d:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
+        sires = ped[ped$SEX=="m" & ped$GEN %in% ((-overlap.s:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
+        dams  = ped[ped$SEX=="f" & ped$GEN %in% ((-overlap.d:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
         # Selection on males
         nm = round(m.rate*nrow(sires))
         if(nm==0) stop("ERROR: No male left. Generation ", i)

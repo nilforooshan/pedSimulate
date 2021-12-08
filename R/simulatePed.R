@@ -181,8 +181,8 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
                 if(ndead > 0) ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
             }
             # Find selection candidates
-            sires = ped[ped$SEX=="m" & ped$GEN %in% (-overlap.s:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
-            dams  = ped[ped$SEX=="f" & ped$GEN %in% (-overlap.d:0)+i-1 & !ped$DEAD, c("ID","SBV","DBV","P")]
+            sires = ped[ped$SEX=="m" & ped$GEN %in% ((-overlap.s:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
+            dams  = ped[ped$SEX=="f" & ped$GEN %in% ((-overlap.d:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
             # Selection on males
             nm = round(m.rate*nrow(sires))
             if(nm==0) stop("ERROR: No male left. Generation ", i)

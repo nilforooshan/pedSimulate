@@ -45,6 +45,8 @@ Function `simulatePed` is for simulating a pedigree from a base population.
 
 Function `appendPed` is for simulating new generations from an existing pedigree and appending to it.
 
+Function `appendGen` is for simulating genotypes for an appended pedigree to an existing pedigree with genotypes.
+
 Function `fs_mate_finder` is for finding fullsib matings in the pedigree.
 
 Function `hs_mate_finder` is for finding halfsib matings in the pedigree.
