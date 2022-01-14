@@ -252,7 +252,8 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
             }
         }
         # Set mates
-        SIRES = c(rep(sires, each=floor(nf/nm)), sires[1:(nf-length(sires)*floor(nf/nm))])
+        SIRES = rep(sires, each=floor(nf/nm))
+        if(length(SIRES) < length(dams)) SIRES = c(SIRES, sires[1:(nf-length(sires)*floor(nf/nm))])
         SIRES = SIRES[order(match(SIRES, sires))]
         tmp = data.frame(SIRE=SIRES, DAM=dams)
         # Append the next generation

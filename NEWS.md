@@ -48,3 +48,7 @@
 
 * A major debug: `%in% (-overlap.s:0)+i-1` was performing differently from `%in% ((-overlap.s:0)+i-1)`, similarly `%in% (-overlap.d:0)+i-1` and `%in% ((-overlap.d:0)+i-1)`.
 * Added function `appendGen` for simulating genotypes for an appended pedigree to an existing pedigree with genotypes.
+
+## Version: 1.3.1
+
+* A small (same) debug in `simulatePed` and `appendPed`.
