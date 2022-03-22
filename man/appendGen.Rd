@@ -4,7 +4,7 @@
 \alias{appendGen}
 \title{Simulate genotypes for an appended pedigree}
 \usage{
-appendGen(ped, M, AF = c(), mut.rate = 0)
+appendGen(ped, M, AF = c(), mut.rate = 0, seed = NA)
 }
 \arguments{
 \item{ped}{: Pedigree \code{data.frame} with columns for animal, sire, and dam identification.}
@@ -14,6 +14,9 @@ appendGen(ped, M, AF = c(), mut.rate = 0)
 \item{AF}{: Vector of allele frequencies at different loci for the genotypes to be simulated. If no value is provided, it will be estimated from \code{M}.}
 
 \item{mut.rate}{: Vector of mutation rates at different loci for the genotypes to be simulated, default = 0 for no mutation.}
+
+\item{seed}{: A numeric variable input to the random number generator for reproducible simulations,
+default = `NA` for non-reproducible simulations.}
 }
 \value{
 M2 : New simulated genotypes appended to \code{M}.
@@ -32,6 +35,6 @@ mut.rate = runif(nSNP, 0, 10^-5)
 ped = data.frame(ID=1:5, SIRE=c(0,0,1,0,3), DAM=c(0,0,2,2,4))
 gen = simulateGen(ped, AF, mut.rate)
 ped = rbind(ped, data.frame(ID=6:8, SIRE=c(3,6,6), DAM=c(0,4,5)))
-gen = appendGen(ped, M=gen, AF)
+gen = appendGen(ped, M=gen, AF, seed=34)
 
 }

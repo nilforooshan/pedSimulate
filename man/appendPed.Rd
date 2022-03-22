@@ -18,7 +18,8 @@ appendPed(
   fsel = "R",
   msel = "R",
   f.order = "fsel",
-  m.order = "msel"
+  m.order = "msel",
+  seed = NA
 )
 }
 \arguments{
@@ -72,6 +73,9 @@ if \code{"R"} random ordering;
 if \code{"P"}, ordering based on phenotypes or true breeding values if \code{Ve} = 0;
 if \code{"PA"}, ordering based on true parent averages.
 \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.}
+
+\item{seed}{: A numeric variable input to the random number generator for reproducible simulations,
+default = `NA` for non-reproducible simulations.}
 }
 \value{
 ped2 : New generations appended to the input pedigree \code{data.frame}.
@@ -110,7 +114,8 @@ ped2 = appendPed(
     fsel = "R",
     msel = "R",
     f.order = "P",
-    m.order = "PA"
+    m.order = "PA",
+    seed = 76
 )
 
 }

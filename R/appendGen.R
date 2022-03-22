@@ -10,6 +10,9 @@
 #'
 #' @param mut.rate : Vector of mutation rates at different loci for the genotypes to be simulated, default = 0 for no mutation.
 #'
+#' @param seed : A numeric variable input to the random number generator for reproducible simulations,
+#' default = `NA` for non-reproducible simulations.
+#'
 #' @return M2 : New simulated genotypes appended to \code{M}.
 #'
 #' @details
@@ -23,10 +26,10 @@
 #' ped = data.frame(ID=1:5, SIRE=c(0,0,1,0,3), DAM=c(0,0,2,2,4))
 #' gen = simulateGen(ped, AF, mut.rate)
 #' ped = rbind(ped, data.frame(ID=6:8, SIRE=c(3,6,6), DAM=c(0,4,5)))
-#' gen = appendGen(ped, M=gen, AF)
+#' gen = appendGen(ped, M=gen, AF, seed=34)
 #'
 #' @export
-appendGen <- function(ped, M, AF=c(), mut.rate=0) {
+appendGen <- function(ped, M, AF=c(), mut.rate=0, seed=NA) {
     if(!identical(as.integer(ped[,1]), 1:nrow(ped))) stop("!identical(as.integer(ped[,1]), 1:nrow(ped)); Please consider renumberring the pedigree: ped[,1:3] <- ggroups::renum(ped[,1:3])$newped")
     stopifnot(nrow(M) < nrow(ped))
     if(nrow(M)==0) stop("The genotype matrix is empty. Please use function simulateGen.")
@@ -34,6 +37,8 @@ appendGen <- function(ped, M, AF=c(), mut.rate=0) {
     if(length(AF)==0) {
         AF = colMeans(M)
     } else {
+        stopifnot(all(is.numeric(AF)))
+        stopifnot(all(!is.na(AF)))
         stopifnot(min(AF)>=0.01)
         stopifnot(max(AF)<=0.99)
     }
@@ -47,6 +52,9 @@ appendGen <- function(ped, M, AF=c(), mut.rate=0) {
     } else {
         message("No mutation was simulated.")
     }
+    stopifnot(length(seed)==1)
+    stopifnot(is.na(seed) | is.numeric(seed))
+    if(!is.na(seed)) set.seed(seed)
     tmp = c()
     SNPs = 1:length(AF)
     # Appending genotypes
@@ -59,14 +67,14 @@ appendGen <- function(ped, M, AF=c(), mut.rate=0) {
             for(j in SNPs) tmp = c(tmp, sample(0:2, 1, prob=c((1-AF[j])^2, 2*(1-AF[j])*AF[j], AF[j]^2)))
         } else if(s>0 & d==0) {
             for(j in SNPs) tmp = c(tmp, sample(0:1, 1, prob=c(1-AF[j], AF[j])))
-            tmp = tmp+makegamete(M[s,])
+            tmp = tmp+makegamete(M[s,], seed=seed)
         } else if(s==0 & d>0) {
             for(j in SNPs) tmp = c(tmp, sample(0:1, 1, prob=c(1-AF[j], AF[j])))
-            tmp = tmp+makegamete(M[d,])
+            tmp = tmp+makegamete(M[d,], seed=seed)
         } else {
-            tmp = makegamete(M[s,])+makegamete(M[d,])
+            tmp = makegamete(M[s,], seed=seed)+makegamete(M[d,], seed=seed)
         }
-        if(!identical(mut.rate, 0)) tmp = mutate(tmp, mut.rate)
+        if(!identical(mut.rate, 0)) tmp = mutate(tmp, mut.rate, seed=seed)
         M = rbind(M, tmp)
         rownames(M) = NULL
     }

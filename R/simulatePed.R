@@ -48,6 +48,9 @@
 #' if \code{"PA"}, ordering based on true parent averages.
 #' \code{"-P"} and \code{"-PA"} work in opposite direction of \code{"P"} and \code{"PA"}, respectively.
 #'
+#' @param seed : A numeric variable input to the random number generator for reproducible simulations,
+#' default = `NA` for non-reproducible simulations.
+#'
 #' @return ped : The output pedigree \code{data.frame}. Further information provided in \strong{Details}.
 #'
 #' @details
@@ -73,54 +76,58 @@
 #'     fsel = "P",
 #'     msel = "PA",
 #'     f.order = "fsel",
-#'     m.order = "msel"
+#'     m.order = "msel",
+#'     seed = 68
 #' )
 #'
 #' @export
-simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0, overlap.d=0, f.rate=1, m.rate=1, fsel="R", msel="R", f.order="fsel", m.order="msel") {
+simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0, overlap.d=0, f.rate=1, m.rate=1, fsel="R", msel="R", f.order="fsel", m.order="msel", seed=NA) {
     # Check inputs
     ## Check F0size
     F0size = round(F0size)
-    if(F0size < 2) stop("ERROR: F0size < 2")
-    if((F0size %% 2)!=0) stop("ERROR: F0size should be an even number.")
+    stopifnot(F0size >= 2)
+    if((F0size %% 2)!=0) stop("F0size should be an even number.")
     ## Check Va0
-    if(Va0 <= 0) stop("ERROR: Va0 <= 0")
+    stopifnot(Va0 > 0)
     ## Check Ve
-    if(Ve < 0) stop("ERROR: Ve < 0")
+    stopifnot(Ve >= 0)
     ## Check littersize
     littersize = round(littersize)
-    if(littersize < 1) stop("ERROR: littersize < 1")
+    stopifnot(littersize >= 1)
     ## Check ngen
     ngen = round(ngen)
-    if(ngen < 1) stop("ERROR: ngen < 1")
+    stopifnot(ngen >= 1)
     ## Check mort.rate
-    if(mort.rate > 0.5) stop("ERROR: mort.rate > 0.5")
-    if(mort.rate < 0) stop("ERROR: mort.rate < 0")
+    stopifnot(mort.rate <= 0.5)
+    stopifnot(mort.rate >= 0)
     ## Check overlap.s
     overlap.s = round(overlap.s)
-    if(overlap.s < 0) stop("ERROR: overlap.s < 0")
-    if(overlap.s >= ngen) stop("ERROR: overlap.s >= ngen")
+    stopifnot(overlap.s >= 0)
+    stopifnot(overlap.s < ngen)
     ## Check overlap.d
     overlap.d = round(overlap.d)
-    if(overlap.d < 0) stop("ERROR: overlap.d < 0")
-    if(overlap.d >= ngen) stop("ERROR: overlap.d >= ngen")
+    stopifnot(overlap.d >= 0)
+    stopifnot(overlap.d < ngen)
     ## Check f.rate
-    if(f.rate > 1) stop("ERROR: f.rate > 1")
-    if(f.rate <= 0) stop("ERROR: f.rate <= 0")
+    stopifnot(f.rate <= 1)
+    stopifnot(f.rate > 0)
     ## Check m.rate
-    if(m.rate > 1) stop("ERROR: m.rate > 1")
-    if(m.rate <= 0) stop("ERROR: m.rate <= 0")
-    if(m.rate > f.rate) stop("ERROR: m.rate > f.rate")
+    stopifnot(m.rate <= 1)
+    stopifnot(m.rate > 0)
+    stopifnot(m.rate <= f.rate)
     ## Check fsel
-    if(!fsel %in% c("R","P","PA","-P","-PA")) stop('ERROR: fsel should be "R", "P", "PA", "-P" or "-PA".')
+    stopifnot(fsel %in% c("R","P","PA","-P","-PA"))
     ## Check msel
-    if(!msel %in% c("R","P","PA","-P","-PA")) stop('ERROR: msel should be "R", "P", "PA", "-P" or "-PA".')
+    stopifnot(msel %in% c("R","P","PA","-P","-PA"))
     ## Check f.order
-    if(!f.order %in% c("fsel", "R","P","PA","-P","-PA")) stop('ERROR: f.order should be "fsel", "R", "P", "PA", "-P" or "-PA".')
+    stopifnot(f.order %in% c("fsel", "R","P","PA","-P","-PA"))
     if(f.order=="fsel") f.order = fsel
     ## Check m.order
-    if(!m.order %in% c("msel", "R","P","PA","-P","-PA")) stop('ERROR: m.order should be "msel", "R", "P", "PA", "-P" or "-PA".')
+    stopifnot(m.order %in% c("msel", "R","P","PA","-P","-PA"))
     if(m.order=="msel") m.order = msel
+    stopifnot(length(seed)==1)
+    stopifnot(is.na(seed) | is.numeric(seed))
+    if(!is.na(seed)) set.seed(seed)
     ## Report what you got
     message("F0size = ", F0size, "\n",
             "Va0 = ", Va0, "\n",
@@ -135,7 +142,8 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
             "fsel = ", fsel, "\n",
             "msel = ", msel, "\n",
             "f.order = ", f.order, "\n",
-            "m.order = ", m.order)
+            "m.order = ", m.order, "\n",
+            "seed = ", seed)
     # F0
     ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P","DEAD")
     ped = data.frame(ID=1:F0size,
@@ -185,7 +193,7 @@ simulatePed <- function(F0size, Va0, Ve, littersize=1, ngen, mort.rate=0, overla
             dams  = ped[ped$SEX=="f" & ped$GEN %in% ((-overlap.d:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
             # Selection on males
             nm = round(m.rate*nrow(sires))
-            if(nm==0) stop("ERROR: No male left. Generation ", i)
+            if(nm==0) stop("No male left. Generation ", i)
             if(msel=="R") {
                 sires = sires[sample(1:nrow(sires), nm),]$ID
             } else if(msel=="P") {

@@ -1,7 +1,7 @@
 #' @title Make mutation
 #'
 #' @noRd
-mutate <- function(genotype, mut.rate) {
+mutate <- function(genotype, mut.rate, seed=NA) {
     stopifnot(length(genotype)==length(mut.rate))
     for(i in which(mut.rate > 0))
     {

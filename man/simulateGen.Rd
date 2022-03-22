@@ -4,14 +4,17 @@
 \alias{simulateGen}
 \title{Simulate genotypes}
 \usage{
-simulateGen(ped, AF = c(), mut.rate = 0)
+simulateGen(ped, AF, mut.rate = 0, seed = NA)
 }
 \arguments{
 \item{ped}{: Pedigree \code{data.frame} with columns for animal, sire, and dam identification.}
 
-\item{AF}{: Vector of allele frequencies at different loci for the genotypes to be simulated. If no value is provided, it will be randomly sampled from a uniform distribution with min = 0.01 and max = 0.99.}
+\item{AF}{: Vector of allele frequencies at different loci for the genotypes to be simulated.}
 
 \item{mut.rate}{: Vector of mutation rates at different loci for the genotypes to be simulated, default = 0 for no mutation.}
+
+\item{seed}{: A numeric variable input to the random number generator for reproducible simulations,
+default = `NA` for non-reproducible simulations.}
 }
 \value{
 M : The simulated genotype \code{data.frame} with rows corresponding to animals (in the same order as in the pedigree) and columns corresponding to markers.
@@ -28,6 +31,6 @@ nSNP = 100
 AF = runif(nSNP, 0.01, 0.99)
 mut.rate = runif(nSNP, 0, 10^-5)
 ped = data.frame(ID=1:5, SIRE=c(0,0,1,0,3), DAM=c(0,0,2,2,4))
-gen = simulateGen(ped, AF, mut.rate)
+gen = simulateGen(ped, AF, mut.rate, seed=684)
 
 }

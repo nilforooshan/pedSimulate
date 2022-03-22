@@ -52,3 +52,7 @@
 ## Version: 1.3.1
 
 * A small (same) debug in `simulatePed` and `appendPed`.
+
+## Version: 1.3.2
+
+* Added `seed` argument to functions for reproducible outputs.
