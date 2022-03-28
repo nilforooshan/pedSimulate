@@ -1,3 +1,11 @@
+[![cran-version](https://www.r-pkg.org/badges/version/pedSimulate)](https://cran.r-project.org/package=pedSimulate)
+[![cran-downloads-total](https://cranlogs.r-pkg.org/badges/grand-total/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
+[![cran-downloads-month](https://cranlogs.r-pkg.org/badges/last-month/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
+[![cran-downloads-week](https://cranlogs.r-pkg.org/badges/last-week/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
+[![github-release](https://img.shields.io/github/release/nilforooshan/pedSimulate.svg)](https://github.com/nilforooshan/pedSimulate)
+[![github-license](https://img.shields.io/github/license/nilforooshan/pedSimulate.svg)](https://github.com/nilforooshan/pedSimulate/blob/master/LICENSE)
+[![github-contributors](https://img.shields.io/github/contributors/nilforooshan/pedSimulate.svg)](https://github.com/nilforooshan/pedSimulate/graphs/contributors/)
+
 # R package 'pedSimulate'
 
 Simulate pedigree, genetic merits and phenotypes with random/assortative/disassortative matings followed by random/non-random selection of males and females with similar/different selection patterns in males and females.
