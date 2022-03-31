@@ -60,6 +60,8 @@
 #'
 #' @return ped2 : New generations appended to the input pedigree \code{data.frame}.
 #'
+#' @importFrom stats rnorm
+#'
 #' @examples
 #' ped = simulatePed(
 #'     F0size = 100,

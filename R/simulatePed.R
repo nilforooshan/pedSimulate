@@ -61,6 +61,8 @@
 #' Random, assortative, and disassortative matings can be simulated with different combinations of
 #' \code{fsel}, \code{msel}, \code{f.order}, and \code{m.order}.
 #'
+#' @importFrom stats rnorm
+#'
 #' @examples
 #' ped = simulatePed(
 #'     F0size = 100,
