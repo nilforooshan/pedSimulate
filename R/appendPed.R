@@ -137,6 +137,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
     ## Check m.order
     stopifnot(m.order %in% c("msel", "R","P","PA","-P","-PA"))
     if(m.order=="msel") m.order = msel
+    # Check min(ped$GEN)
+    stopifnot(min(ped$GEN)==0)
+    minGEN = min(ped$GEN)
+    maxGEN = max(ped$GEN)
+    # Check seed
     stopifnot(length(seed)==1)
     stopifnot(is.na(seed) | is.numeric(seed))
     if(!is.na(seed)) set.seed(seed)
@@ -156,26 +161,10 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
             "f.order = ", f.order, "\n",
             "m.order = ", m.order, "\n",
             "seed = ", seed)
-    ordcol = c("ID","SIRE","DAM","SEX","GEN","SBV","DBV","MS","E","P","DEAD")
-    # Process the input pedigree
-    ped$BV = ped$PA + ped$MS
-    ped = merge(ped, ped[,c("ID","BV")], by.x="SIRE", by.y="ID", all.x=TRUE)
-    colnames(ped)[which(colnames(ped)=="BV.x")] = "BV"
-    colnames(ped)[which(colnames(ped)=="BV.y")] = "SBV"
-    ped = merge(ped, ped[,c("ID","BV")], by.x="DAM", by.y="ID", all.x=TRUE)
-    colnames(ped)[which(colnames(ped)=="BV.x")] = "BV"
-    colnames(ped)[which(colnames(ped)=="BV.y")] = "DBV"
-    ped[is.na(ped$SBV),]$SBV = 0
-    ped[is.na(ped$DBV),]$DBV = 0
-    ped$MS = ped$MS + ped$PA - (ped$SBV + ped$DBV)/2
     ped$DEAD = FALSE
-    ped = ped[order(ped$ID),]
-    maxGEN = max(ped$GEN)
-    minGEN = min(ped$GEN)
     message("Started with a pedigree of ", nrow(ped), " individuals and maximum generation number ", maxGEN)
     # Find the population mean
-    popmean = mean(ped$P - ped$PA - ped$MS - ped$E)
-    ped = ped[,ordcol]
+    popmean = mean(ped$P[ped$GEN==0] - ped$PA[ped$GEN==0] - ped$MS[ped$GEN==0] - ped$E[ped$GEN==0]) # [ped$GEN==0] is not necessary, but for safety!
     # Mortality before the last generation
     if(mort.rate > 0 & minGEN!=maxGEN) {
         for(i in (minGEN+1):maxGEN)
@@ -188,14 +177,14 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
     for(i in maxGEN+(1:ngen))
     {
         # Mortality before maturity
-        # Mortality after maturity is applied via overlap.s & overlap.d
+            # Mortality after maturity is applied via overlap.s & overlap.d
         if(mort.rate > 0) {
             ndead = round(mort.rate*nrow(ped[ped$GEN==(i-1),]))
             if(ndead > 0) ped[sample(which(ped$GEN==(i-1)), ndead), "DEAD"] = TRUE
         }
         # Find selection candidates
-        sires = ped[ped$SEX=="m" & ped$GEN %in% ((-overlap.s:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
-        dams  = ped[ped$SEX=="f" & ped$GEN %in% ((-overlap.d:0)+i-1) & !ped$DEAD, c("ID","SBV","DBV","P")]
+        sires = ped[ped$SEX=="m" & ped$GEN %in% ((-overlap.s:0)+i-1) & !ped$DEAD, c("ID","PA","P")]
+        dams  = ped[ped$SEX=="f" & ped$GEN %in% ((-overlap.d:0)+i-1) & !ped$DEAD, c("ID","PA","P")]
         # Selection on males
         nm = round(m.rate*nrow(sires))
         if(nm==0) stop("No male left. Generation ", i)
@@ -204,11 +193,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         } else if(msel=="P") {
             sires = sires[order(-sires$P),]$ID[1:nm]
         } else if(msel=="PA") {
-            sires = sires[order(-sires$SBV -sires$DBV),]$ID[1:nm]
+            sires = sires[order(-sires$PA),]$ID[1:nm]
         } else if(msel=="-P") {
             sires = sires[order(sires$P),]$ID[1:nm]
         } else if(msel=="-PA") {
-            sires = sires[order(sires$SBV + sires$DBV),]$ID[1:nm]
+            sires = sires[order(sires$PA),]$ID[1:nm]
         }
         # Selection on females
         nf = round(f.rate*nrow(dams))
@@ -217,11 +206,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         } else if(fsel=="P") {
             dams = dams[order(-dams$P),]$ID[1:nf]
         } else if(fsel=="PA") {
-            dams = dams[order(-dams$SBV -dams$DBV),]$ID[1:nf]
+            dams = dams[order(-dams$PA),]$ID[1:nf]
         } else if(fsel=="-P") {
             dams = dams[order(dams$P),]$ID[1:nf]
         } else if(fsel=="-PA") {
-            dams = dams[order(dams$SBV + dams$DBV),]$ID[1:nf]
+            dams = dams[order(dams$PA),]$ID[1:nf]
         }
         # Order males
         if(m.order!=msel) {
@@ -235,11 +224,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
             } else if(m.order=="P") {
                 sires = sires[order(-sires$P),]$ID
             } else if(m.order=="PA") {
-                sires = sires[order(-sires$SBV -sires$DBV),]$ID
+                sires = sires[order(-sires$PA),]$ID
             } else if(m.order=="-P") {
                 sires = sires[order(sires$P),]$ID
             } else if(m.order=="-PA") {
-                sires = sires[order(sires$SBV + sires$DBV),]$ID
+                sires = sires[order(sires$PA),]$ID
             }
         }
         # Order females
@@ -254,11 +243,11 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
             } else if(f.order=="P") {
                 dams = dams[order(-dams$P),]$ID
             } else if(f.order=="PA") {
-                dams = dams[order(-dams$SBV -dams$DBV),]$ID
+                dams = dams[order(-dams$PA),]$ID
             } else if(f.order=="-P") {
                 dams = dams[order(dams$P),]$ID
             } else if(f.order=="-PA") {
-                dams = dams[order(dams$SBV + dams$DBV),]$ID
+                dams = dams[order(dams$PA),]$ID
             }
         }
         # Set mates
@@ -269,23 +258,21 @@ appendPed <- function(ped, Va0, Ve, littersize=1, ngen, mort.rate=0, overlap.s=0
         # Append the next generation
         tmp = data.frame(SIRE=rep(tmp$SIRE, littersize), DAM=rep(tmp$DAM, littersize))
         tmp$ID = (1:nrow(tmp))+nrow(ped)
-        tmp = merge(tmp, ped[,c("ID","SBV","DBV","MS")], by.x="SIRE", by.y="ID")
-        tmp = merge(tmp, ped[,c("ID","SBV","DBV","MS")], by.x="DAM",  by.y="ID")
-        tmp$SBV = (tmp$SBV.x + tmp$DBV.x)/2 + tmp$MS.x
-        tmp$DBV = (tmp$SBV.y + tmp$DBV.y)/2 + tmp$MS.y
+        tmp = merge(tmp, ped[,c("ID","PA","MS")], by.x="SIRE", by.y="ID")
+        tmp = merge(tmp, ped[,c("ID","PA","MS")], by.x="DAM",  by.y="ID")
+        tmp$PA = (tmp$PA.x + tmp$MS.x + tmp$PA.y + tmp$MS.y)/2
         tmp$SEX = sample(c("m","f"), nrow(tmp), replace=TRUE)
         tmp$GEN = i
         tmp$MS=rnorm(nrow(tmp), 0, sqrt(Va0/2))
         tmp$E=rnorm(nrow(tmp), 0, sqrt(Ve))
-        tmp$P = (tmp$SBV + tmp$DBV)/2 + tmp$MS + tmp$E + popmean
+        tmp$P = tmp$PA + tmp$MS + tmp$E + popmean
         tmp$DEAD = FALSE
+        tmp = tmp[order(tmp$ID),]
         message("Simulated generation ", i, " with ", nrow(tmp), " individuals.")
-        ped = rbind(ped, tmp[,ordcol])
+        ped = rbind(ped, tmp[,colnames(ped)])
     }
-    # Replace SBV & DBV with PA
-    ped$PA = (ped$SBV + ped$DBV)/2
-    ped = ped[,c("ID","SIRE","DAM","SEX","GEN","PA","MS","E","P")]
-    ped = ped[order(ped$ID),]
+    # Drop DEAD column
+    ped = ped[,-ncol(ped)]
     rownames(ped) = 1:nrow(ped)
     return(ped)
 }

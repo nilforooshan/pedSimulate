@@ -56,3 +56,8 @@
 ## Version: 1.3.2
 
 * Added `seed` argument to functions for reproducible outputs.
+
+## Version: 1.4.0
+
+* Debugged function `appendPed` for making no updates to the existing pedigree (the pedigree upon which new generations are appended).
+* "Bijma, P. & Rutten, M. (2002)" gone missing on the web. References were added.

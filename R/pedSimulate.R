@@ -33,4 +33,9 @@
 #' For a given pedigree, genotypes can be simulated.
 #' Marker effects can be chosen by the researcher and added to the simulated phenotypes.
 #' In that case, genetic effects and variance used to simulate phenotypes change to residual polygenic effects and variance (genetic effects and variance not explained by the markers).
+#'
+#' @references
+#' Mrode, R. A. 2005. Linear Models for the Prediction of Animal Breeding Values, 2nd ed. Cambridge, MA: CABI Publishing. <ISBN:9780851989969, 0851989969>
+#'
+#' Nilforooshan, M. A. 2022. pedSimulate – An R package for simulating pedigree, genetic merit, phenotype, and genotype data. R. Bras. Zootec., 51:e20210131. <doi:10.37496/rbz5120210131>
 NULL
