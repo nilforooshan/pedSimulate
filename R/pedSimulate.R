@@ -2,7 +2,7 @@
 #'
 #' @docType package
 #'
-#' @name pedSimulte-package
+#' @aliases pedSimulate-package
 #'
 #' @author Mohammad Ali Nilforooshan \email{m.a.nilforooshan@gmail.com}
 #'
