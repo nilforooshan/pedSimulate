@@ -1,7 +1,7 @@
 #' @title Pedigree, genetic merit, phenotype, and genotype simulation
 #'
 #' @docType package
-#'
+#' @name pedSimulate-package
 #' @aliases pedSimulate-package
 #'
 #' @author Mohammad Ali Nilforooshan \email{m.a.nilforooshan@gmail.com}

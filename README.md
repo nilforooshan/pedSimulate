@@ -30,7 +30,7 @@ devtools::install_github('nilforooshan/pedSimulate')
 An R package for simulating pedigree, genetic merits, phenotypes, and genotypes, starting from a base population (generation 0) or an existing pedigree.
 The pedigree depth and design can be chosen by the values provided to the arguments of the simulation function.
 
-Arguments are provided for the following: 
+Arguments are provided for the following:
 
 - Number of founder animals or an initial pedigree
 - Additive genetic variance in the base generation

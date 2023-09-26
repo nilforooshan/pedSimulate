@@ -65,3 +65,7 @@
 ## Version: 1.4.1
 
 - Fixed the naming issue `pedSimulte-package` in the documentation.
+
+## Version: 1.4.3
+
+- `man/pedSimulte-package.Rd` was missing in the previous version.
