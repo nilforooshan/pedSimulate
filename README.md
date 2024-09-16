@@ -1,4 +1,4 @@
-[![cran-version](https://www.r-pkg.org/badges/version/pedSimulate)](https://cran.r-project.org/package=pedSimulate)
+[![cran-version-last-release](https://www.r-pkg.org/badges/version-last-release/pedSimulate)](https://cran.r-project.org/package=pedSimulate)
 [![cran-downloads-total](https://cranlogs.r-pkg.org/badges/grand-total/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
 [![cran-downloads-month](https://cranlogs.r-pkg.org/badges/last-month/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
 [![cran-downloads-week](https://cranlogs.r-pkg.org/badges/last-week/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
