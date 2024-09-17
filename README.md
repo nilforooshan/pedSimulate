@@ -1,3 +1,4 @@
+[![R-CMD-check](https://github.com/nilforooshan/pedSimulate/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nilforooshan/pedSimulate/actions/workflows/R-CMD-check.yaml)
 [![cran-version-last-release](https://www.r-pkg.org/badges/version-last-release/pedSimulate)](https://cran.r-project.org/package=pedSimulate)
 [![cran-downloads-total](https://cranlogs.r-pkg.org/badges/grand-total/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
 [![cran-downloads-month](https://cranlogs.r-pkg.org/badges/last-month/pedSimulate?color=green)](https://cran.r-project.org/package=pedSimulate)
